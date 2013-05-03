@@ -160,6 +160,21 @@ public class XMLElement {
 				return false;
 		} else if (!name.equals(other.name))
 			return false;
+		
+		// test equals based on same attributes
+		if (attributes == null) {
+			if (other.attributes != null)
+				return false;
+		} else if (attributes.size() != other.attributes.size()) {
+			return false;
+		} else {
+			for (XMLAttribute attr : attributes) {
+				if (!other.attributes.contains(attr)) {
+					return false;
+				}
+			}
+		}
+		
 		return true;
 	}
 
