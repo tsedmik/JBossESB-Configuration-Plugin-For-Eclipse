@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="org.eclipse.ui.editors">
+      <editor
+            class="org.jboss.jbossesb.eclipse.plugin.view.GraphicalEditor"
+            contributorClass="org.jboss.jbossesb.eclipse.plugin.view.GraphicalEditorActionBarContributor"
+            default="true"
+            filenames="jbossesb.xml"
+            icon="META-INF/icon.gif"
+            id="org.jboss.jbossesb.eclipse.plugin.editor"
+            name="JBossESB GEF Editor">
+      </editor>
+   </extension>
+
+</plugin>

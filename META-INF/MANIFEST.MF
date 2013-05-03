@@ -1,0 +1,15 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: JBossESB-Configuration-Plugin-For-Eclipse
+Bundle-SymbolicName: JBossESB-Configuration-Plugin-For-Eclipse;singleton:=true
+Bundle-Version: 1.0.0.qualifier
+Bundle-Activator: org.jboss.jbossesb.eclipse.plugin.configuration.Activator
+Bundle-Vendor: tomas.sedmik@gmail.com
+Require-Bundle: org.eclipse.ui,
+ org.eclipse.core.runtime,
+ org.eclipse.gef;bundle-version="3.7.2",
+ org.eclipse.core.resources;bundle-version="3.8.1",
+ org.eclipse.ui.editors;bundle-version="3.8.0",
+ org.junit;bundle-version="4.10.0"
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-ActivationPolicy: lazy

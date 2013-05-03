@@ -1,0 +1,66 @@
+<?xml version="1.0"?>
+<jbossesb parameterReloadSecs="5"
+ xmlns="http://anonsvn.labs.jboss.com/labs/jbossesb/trunk/product/etc/schemas/xml/jbossesb-1.3.0.xsd"
+ xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://anonsvn.labs.jboss.com/labs/jbossesb/trunk/product/etc/schemas/xml/jbossesb-1.3.0.xsd http://anonsvn.jboss.org/repos/labs/labs/jbossesb/trunk/product/etc/schemas/xml/jbossesb-1.3.0.xsd">
+ <providers>
+  <jms-provider connection-factory="ConnectionFactory" name="JBossMQ">
+   <property name="dsdsad" value="asdasdsa">
+    <asdasdasd/>
+   </property>
+   <jms-buse busid="ESBChannel">
+    <jms-message-filter dest-name="sdfsdfsdfs" dest-type="TOPIC"/>
+   </jms-bus>
+   <jms-bus busid="aaaa"/>
+  </jms-provider>
+  <ftp-provider hostname="ftp.jbossftp.com" name="JBossFTP">
+   <ftp-bus busid="ftp">
+    <ftp-message-filter directory="" input-suffix="" passive="true"
+     password="" protocol="sftp" username=""/>
+   </ftp-bus>
+   <ftp-bus busid="ftp2"/>
+  </ftp-provider>
+  <http-provider name="JBossHTTP">
+   <http-bus busid="JBossHTTPChannel" transportGuarantee="INTEGRAL">
+    <protected-methods>
+     <method name="GET"/>
+     <method name="POST"/>
+     <method name="PUT"/>
+    </protected-methods>
+   </http-bus>
+  </http-provider>
+  <sql-provider name="sql">
+   <sql-bus busid="sql"/>
+  </sql-provider>
+  <bus-provider name="aaa">
+   <bus busid="xfxf"/>
+  </bus-provider>
+ </providers>
+ <services>
+  <service alertLengthThreshold="10" alertTimeThreshold="10"
+   category="FirstServiceESB"
+   description="First Service ESB - HelloWorld" invmScope="NONE"
+   invmTransacted="true" name="SimpleListener">
+   <security callbackHandler="ASDFG" moduleName="TEST"
+    rolesAllowed="ADMINS" runAs="ADMIN" useCallerIdentity="SEDMIK">
+    <property name="essfdsfsdfsd" value="sdfsdfsdf"/>
+    <property name="pokus" value="hodnota">
+     <fsfdsfsdf ahoj="jak se mas">sdfsffsdfsdfsdf<sdfdsfsdf asgsdgds="asdasdsd"/>
+      <fsdfsdfs/>
+     </fsfdsfsdf>
+    </property>
+   </security>
+   <property name="aaaaa" value="aaaaa"/>
+   <listeners>
+    <jms-listener busidref="ESBChannel" clientId="123456"
+     durableSubscriptionName="1231231" name="helloWorld"/>
+   </listeners>
+   <actions>
+    <action
+     class="org.jboss.soa.esb.samples.helloworld.MyJMSListenerAction"
+     name="SayHello" process="displayMessage"/>
+   </actions>
+  </service>
+  <service category="FirstServiceESB" description="asdasdsad" name="NextListener"/>
+  <service category="pokusna" description="pokus" name="pokus"/>
+ </services>
+</jbossesb>
