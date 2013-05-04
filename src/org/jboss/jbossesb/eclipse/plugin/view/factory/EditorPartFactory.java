@@ -16,14 +16,20 @@ import org.jboss.jbossesb.eclipse.plugin.view.part.ServicePart;
  * @since 2013-03-07
  */
 public class EditorPartFactory implements EditPartFactory {
-
+	
 	@Override
 	public EditPart createEditPart(EditPart context, Object model) {
+		
 		EditPart part = null;
+		
 		if (model instanceof XMLDocument) {
+			
 			part = new EditorPart();
+			
 		} else if (model instanceof XMLElement) {
+			
 			String adress = ((XMLElement) model).getAddress();
+			
 			if (adress.equals("/jbossesb")) {
 				part = new JBossESBPart();
 			} else if (adress.startsWith("/jbossesb/providers")) {

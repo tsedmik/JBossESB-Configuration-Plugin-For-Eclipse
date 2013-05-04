@@ -5,16 +5,19 @@ import java.util.EventObject;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.draw2d.geometry.Rectangle;
 import org.eclipse.gef.DefaultEditDomain;
 import org.eclipse.gef.palette.PaletteRoot;
 import org.eclipse.gef.ui.parts.GraphicalEditorWithFlyoutPalette;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.PartInitException;
+import org.jboss.jbossesb.eclipse.plugin.controller.XMLElementManipulator;
 import org.jboss.jbossesb.eclipse.plugin.controller.XMLException;
 import org.jboss.jbossesb.eclipse.plugin.controller.XMLManipulator;
 import org.jboss.jbossesb.eclipse.plugin.controller.XMLManipulatorImpl;
 import org.jboss.jbossesb.eclipse.plugin.model.XMLDocument;
+import org.jboss.jbossesb.eclipse.plugin.model.XMLElement;
 import org.jboss.jbossesb.eclipse.plugin.view.factory.EditorPartFactory;
 
 /**
@@ -78,6 +81,7 @@ public class GraphicalEditor extends GraphicalEditorWithFlyoutPalette {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		setInitialPosition(document);
 	}
 	
 	/**
@@ -87,5 +91,29 @@ public class GraphicalEditor extends GraphicalEditorWithFlyoutPalette {
 	@Override public void commandStackChanged(EventObject event) {
 		firePropertyChange(PROP_DIRTY);
 		super.commandStackChanged(event);
-	} 
+	}
+	
+	/**
+	 * Method sets initial position in the editor.
+	 * 
+	 * @param doc Object model of the JBoss ESB configuration file.
+	 */
+	private void setInitialPosition(XMLDocument doc) {
+		
+		int start = 40;
+		for (XMLElement elem : doc.getProviders()) {
+			int height = 28 + XMLElementManipulator.getBuses(elem).size() * 28;
+			Rectangle layout = new Rectangle(2, start, 300, height);
+			start = start + height + 8;
+			elem.setRectangle(layout);
+		}
+		
+		start = 40;
+		for (XMLElement elem : doc.getServices()) {
+			int height = 50;
+			Rectangle layout = new Rectangle(400, start, 200, height);
+			start = start + height + 15;
+			elem.setRectangle(layout);
+		}
+	}
 }
