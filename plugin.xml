@@ -10,6 +10,7 @@
             filenames="jbossesb.xml"
             icon="META-INF/icon.gif"
             id="org.jboss.jbossesb.eclipse.plugin.editor"
+            matchingStrategy="org.jboss.jbossesb.eclipse.plugin.configuration.MatchingStrategy"
             name="JBossESB GEF Editor">
       </editor>
    </extension>
