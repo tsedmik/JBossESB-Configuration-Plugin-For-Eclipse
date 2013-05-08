@@ -1,6 +1,5 @@
 package org.jboss.jbossesb.eclipse.plugin.view.part;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
