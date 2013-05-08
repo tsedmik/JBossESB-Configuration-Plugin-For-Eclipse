@@ -15,6 +15,7 @@ public class ProviderFactory implements CreationFactory {
 	public Object getNewObject() {
 		
 		// TODO set some basic attributes - address
+		// TODO show dialog here or step before?
 		XMLElement provider = new XMLElement();
 		provider.setAddress("/jbossesb/providers");
 		

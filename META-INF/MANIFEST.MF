@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: JBossESB-Configuration-Plugin-For-Eclipse
 Bundle-SymbolicName: JBossESB-Configuration-Plugin-For-Eclipse;singleton:=true
-Bundle-Version: 1.0.0.qualifier
+Bundle-Version: 0.9
 Bundle-Activator: org.jboss.jbossesb.eclipse.plugin.configuration.Activator
 Bundle-Vendor: tomas.sedmik@gmail.com
 Require-Bundle: org.eclipse.ui,

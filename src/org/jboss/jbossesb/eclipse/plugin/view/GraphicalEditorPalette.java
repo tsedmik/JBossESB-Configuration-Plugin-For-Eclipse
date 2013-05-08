@@ -30,7 +30,6 @@ public class GraphicalEditorPalette extends PaletteRoot {
 		addSelectionTool();
 		addProviderTool();
 		addServiceTool();
-		addConnectionTool();
 	}
 	
 	private void addGroup() {
@@ -58,19 +57,13 @@ public class GraphicalEditorPalette extends PaletteRoot {
 		
 		for (String key : keys) {
 			String value = providers.get(key);
-			CreationToolEntry entry = new CreationToolEntry(value, "Create a new " + value + " Provider", new ProviderFactory("key"), null, null);
+			CreationToolEntry entry = new CreationToolEntry(value, "Create a new " + value + " Provider", new ProviderFactory(key), null, null);
 			provider.add(entry);
 		}
 	}
 	
 	private void addServiceTool() {
 		CreationToolEntry entry = new CreationToolEntry("Service", "Create a new Service", new ServiceFactory(), null, null);
-		service.add(entry);
-	}
-	
-	private void addConnectionTool() {
-		//TODO implement this method
-		CreationToolEntry entry = new CreationToolEntry("Connection", "Create a new Connection", new ServiceFactory(), null, null);
 		service.add(entry);
 	}
 }
