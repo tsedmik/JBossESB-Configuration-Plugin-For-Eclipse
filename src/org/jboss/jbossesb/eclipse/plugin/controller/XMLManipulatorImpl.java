@@ -2,6 +2,7 @@ package org.jboss.jbossesb.eclipse.plugin.controller;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -25,6 +26,9 @@ import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 import javax.xml.validation.Validator;
 
+import org.eclipse.core.runtime.FileLocator;
+import org.eclipse.core.runtime.Platform;
+import org.jboss.jbossesb.eclipse.plugin.configuration.Activator;
 import org.jboss.jbossesb.eclipse.plugin.model.QueueTuple;
 import org.jboss.jbossesb.eclipse.plugin.model.XMLAttribute;
 import org.jboss.jbossesb.eclipse.plugin.model.XMLDocument;
@@ -68,7 +72,12 @@ public class XMLManipulatorImpl implements XMLManipulator {
 		SchemaFactory factory = SchemaFactory.newInstance(schemaLang);
 
 		try {
-			Schema schema = factory.newSchema(new File(configuration.getString("JBossESB-XMLSchema")));
+			
+			// locate xml schema file
+			URL url = Platform.getBundle(Activator.PLUGIN_ID).getEntry(configuration.getString("JBossESB-XMLSchema"));
+			String fileURL = FileLocator.toFileURL(url).toString();
+			Schema schema = factory.newSchema(new File(fileURL.substring(5)));
+			
 			Validator validator = schema.newValidator();
 			validator.validate(new StreamSource(confFile));
 		} catch (SAXException e) {
