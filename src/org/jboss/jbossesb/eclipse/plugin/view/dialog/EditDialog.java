@@ -1,8 +1,6 @@
 package org.jboss.jbossesb.eclipse.plugin.view.dialog;
 
-import java.util.HashMap;
 import java.util.Map;
-import java.util.Stack;
 
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.dialogs.TitleAreaDialog;
@@ -10,15 +8,16 @@ import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.graphics.Font;
-import org.eclipse.swt.graphics.FontData;
+import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
+
 import org.eclipse.swt.widgets.Text;
 import org.jboss.jbossesb.eclipse.plugin.controller.PropertiesManipulator;
 import org.jboss.jbossesb.eclipse.plugin.model.XMLAttribute;
@@ -33,70 +32,38 @@ import org.jboss.jbossesb.eclipse.plugin.model.XMLElement;
 public class EditDialog extends TitleAreaDialog {
 
 	private XMLElement data;
-	private PropertiesManipulator propManipulator;
-	private Map<String, String> properties;
-	private Map<String, Control> objects; // address + value in the form
+	private QueueTuple root;
 
 	public EditDialog(Shell parentShell, XMLElement data) {
 		super(parentShell);
 		this.data = data;
-		propManipulator = new PropertiesManipulator(data.getAddress());
-		objects = new HashMap<String, Control>();
-		
-		Map<String, String> temp = PropertiesManipulator.convertResourceBundleToMap(propManipulator.getResource());
-		properties = PropertiesManipulator.alterProperties(temp);
 	}
 
 	@Override
 	public void create() { 
 		super.create();
 
-		// Set the title
 		setTitle(data.getName());
-
-		// Set the hint
-		if (data.getHint() != null) {
-			setMessage(data.getHint(), IMessageProvider.INFORMATION);
-		}
+		setDefaultMessage();
 	}
 
 	@Override
 	protected Control createDialogArea(Composite parent) {
 		
 		// layout
-		GridLayout layout = new GridLayout();
-		layout.numColumns = 2;
-		layout.horizontalSpacing = GridData.FILL;
-		parent.setLayout(layout);
+		//FIXME correct dialog layout
+		Composite composite = new Composite(parent, SWT.V_SCROLL | SWT.H_SCROLL);
+        composite.setLayout(new GridLayout());
 		
-		// content
-		addAttributes(parent, data); // root XMLElement attributes
-		
-		// TODO Add exception for 'Global settings' add to stack only root and globals XMLElement
-		Stack<XMLElement> stack = new Stack<XMLElement>();
-		for (XMLElement child : data.getChildren()) {
-			stack.push(child);
-		}
-		
-		while (!stack.isEmpty()) {
-			XMLElement element = stack.pop();
-			for (XMLElement child : element.getChildren()) {
-				stack.push(child);
-			}
-			
-			Label label = new Label(parent, SWT.BOLD);
-			label.setText(element.getName());
-			label.setFont(new Font(parent.getDisplay(), getFont(element.getAddress())));
-			label = new Label(parent, SWT.NONE);
-			
-			addAttributes(parent, element);
-			
-		}
-		
-		//addElements(parent, data);
+		// add content
+		root = new QueueTuple(data.getAddress(), composite, null, null);
+		addAttributes(root, data); // root XMLElement attributes
+		addElements(root, data); // add child elements
+		addOperations(root); // add edit options
 		
 		return parent;
 	}
+	
 
 	@Override
 	protected void createButtonsForButtonBar(Composite parent) {
@@ -137,6 +104,34 @@ public class EditDialog extends TitleAreaDialog {
 		super.okPressed();
 	}
 
+	private void setDefaultMessage() {
+		
+		setErrorMessage(null);
+		
+		// Set the hint
+		if (data.getHint() != null) {
+			setMessage(data.getHint(), IMessageProvider.INFORMATION);
+		} else {
+			setMessage("");
+		}
+	}
+	
+	private Composite setGroupLayout(Composite parent, String name) {
+		
+		// layout (group)
+		Group group = new Group(parent, 0);
+		group.setText(name);
+		group.setLayout(new FillLayout());
+				
+		Composite composite = new Composite(group, 0);
+		GridLayout layout = new GridLayout();
+		layout.numColumns = 2;
+		layout.horizontalSpacing = GridData.FILL;
+		composite.setLayout(layout);
+		
+		return composite;
+	}
+	
 	/**
 	 * Create an OK button with input validation.
 	 * 
@@ -201,68 +196,253 @@ public class EditDialog extends TitleAreaDialog {
 		// TODO save input to the model
 	}
 
-	/**
-	 * Add element's attributes to the form.
-	 * 
-	 * @param parent The parent object.
-	 */
-	private void addAttributes(Composite parent, XMLElement element) {
+	private void addAttributes(QueueTuple parent, XMLElement element) {
 		
-		Map<String, String> attributes = PropertiesManipulator.getAttributesToElement(properties, element.getAddress());
+		// loading configuration
+		PropertiesManipulator propManipulator = new PropertiesManipulator(parent.getAddress());
+		Map<String, String> tempProperties = PropertiesManipulator.convertResourceBundleToMap(propManipulator.getResource());
+		Map<String, String> properties = PropertiesManipulator.alterProperties(tempProperties);
 		
+		// set layout
+		Composite composite = new Composite((Composite)parent.getControl(), 0);
+		GridLayout layout = new GridLayout();
+		layout.numColumns = 2;
+		layout.horizontalSpacing = GridData.FILL;
+		composite.setLayout(layout);
+		
+		// get all attributes attached the element
+		Map<String, String> attributes = PropertiesManipulator.getAttributesToElement(properties, parent.getAddress());
+		
+		// print attributes
 		for (String address : attributes.keySet()) {
-			Label label = new Label(parent, SWT.NONE);
+			
+			// set label (with char * if is required)
+			Label label = new Label(composite, SWT.NONE);
 			if (propManipulator.getSomeAttributeValue(address, AttributeValues.REQUIRED).equals("R")) {
 				label.setText(propManipulator.getSomeAttributeValue(address, AttributeValues.NAME) + "*");
 			} else {
 				label.setText(propManipulator.getSomeAttributeValue(address, AttributeValues.NAME));
 			}
 			
-			// for attribute's type - String
-			Text text = new Text(parent, SWT.BORDER);
+			// create text field
+			// TODO distinct different data types of attributes and allow only such values belongs in the definition set
+			Text text = new Text(composite, SWT.BORDER);
 			text.setLayoutData(new GridData(GridData.FILL, GridData.FILL, true, false));
-			objects.put(address, text);
-			// set data (if exists)
-			// TODO if no data exists set a default value (save only if a user confirms it)
+			
+			// add to the tree representation of dialog
+			QueueTuple object = new QueueTuple(address, text, null, parent);
+			parent.addChildren(object);
+			
+			// set data from the model (if exists)
 			String[] temp = address.split("/");
 			String attributeXMLName = temp[temp.length - 1];
 			XMLAttribute attribute = element.getAttribute(attributeXMLName);
 			if (attribute != null && attribute.getValue() != null) {
 				text.setText(attribute.getValue());
+			} else {
+
+				// TODO if no data exists set a default value (save only if a user confirms it)
+				
 			}
 		}
 	}
 	
-	private  void addElements(Composite parent, XMLElement element) {
-				
-		// get elements direct under 'data' variable
-		Map<String, String> elements = PropertiesManipulator.getElementsFromMap(properties);
-		elements = PropertiesManipulator.getElementsUnderElement(elements, element.getAddress());
+	private  void addElements(QueueTuple parent, XMLElement element) {
 		
-		for (String address : elements.keySet()) {
-			Label label = new Label(parent, SWT.BOLD);
-			label.setText(propManipulator.getSomeElementValue(address, ElementValues.NAME));
-			label = new Label(parent, SWT.NONE);
+		// hack for "global settings" only
+		if (parent.getAddress().equals("/jbossesb")) {
+			
+			// add only element <globals>, if exists
+			for (XMLElement child : element.getChildren()) {
+				if (child.getAddress().equals("/jbossesb/globals")) {
+					addElement(parent, child);
+				}
+			}
+			return;
+		}
+		
+		// everything else
+		for (XMLElement child : element.getChildren()) {
+			addElement(parent, child);
 		}
 	}
 	
-	/**
-	 * Get font size based on depth of XMLElement
-	 * @param address
-	 * @return
-	 */
-	private FontData getFont(String address) {
+	private void addElement(QueueTuple parent, XMLElement element) {
 		
-		FontData fd = new FontData();
+		// layout
+		Composite composite = setGroupLayout((Composite)parent.getControl(), element.getName());
 		
-		if (address == null) {
-			return fd;
+		// add element to the tree
+		QueueTuple tuple = new QueueTuple(element.getAddress(), composite, null, parent);
+		parent.addChildren(tuple);
+		
+		// add remove button
+		createRemoveButton(tuple);
+		
+		// add content
+		addAttributes(tuple, element);
+		addElements(tuple, element);
+		addOperations(tuple);
+	}
+	
+	private void addOperations(QueueTuple parent) {
+		
+		// layout (group)
+		Composite composite = null;
+		QueueTuple tuple = null;
+		
+		// loading configuration
+		PropertiesManipulator propManipulator;
+		// hack for "Global settings"
+		if (parent.getAddress().equals("/jbossesb")) {
+			propManipulator = new PropertiesManipulator("/jbossesb/globals");
+		} else {
+			propManipulator = new PropertiesManipulator(parent.getAddress());
+		}
+		Map<String, String> temp = PropertiesManipulator.convertResourceBundleToMap(propManipulator.getResource());
+		Map<String, String> properties = PropertiesManipulator.alterProperties(temp);
+		Map<String, String> tempelements = PropertiesManipulator.getElementsFromMap(properties);
+		Map<String, String> elements = PropertiesManipulator.getElementsUnderElement(tempelements, parent.getAddress());
+		
+		// compare with current model and add buttons
+		for (String key : elements.keySet()) {
+			
+			// true if element exists in view
+			boolean exists = false;
+			if (parent.getChildren() != null) {
+				for (QueueTuple temp2 : parent.getChildren()) {
+					if (temp2.getAddress().equals(key)) {
+						exists = true;
+					}
+				}
+			}
+			
+			String required = propManipulator.getSomeElementValue(key, ElementValues.REQUIRED).substring(1);
+			String name = propManipulator.getSomeElementValue(key, ElementValues.NAME);
+			
+			// add "add buttons" if can
+			if (exists) {
+				if (required.equals("1N") || required.equals("0N")) {
+					if (composite == null) {
+						composite = setGroupLayout((Composite)parent.getControl(), "Operations");
+						tuple = new QueueTuple("o", composite, null, parent);
+						parent.addChildren(tuple);
+					}
+					createAddButton(tuple, key, name);
+				}
+			} else {
+				if (composite == null) {
+					composite = setGroupLayout((Composite)parent.getControl(), "Operations");
+					tuple = new QueueTuple("o", composite, null, parent);
+					parent.addChildren(tuple);
+				}
+				createAddButton(tuple, key, name);
+			}	
+		}
+	}
+	
+	private void renewOperations(QueueTuple parent) {
+		
+		// dispose old group with operations
+		for (QueueTuple tuple : parent.getChildren()) {
+			if (tuple.getAddress().equals("o")) {
+				parent.removeChildren(tuple);
+				tuple.getControl().getParent().dispose();
+				break;
+			}
 		}
 		
-		int depth = address.split("/").length;
-		fd.setHeight(30-depth*2);
-		fd.setStyle(SWT.BOLD);
+		// create new group with operations
+		addOperations(parent);
 		
-		return fd;
+		// refresh view
+		parent.getControl().getShell().pack();
+		((Composite)parent.getControl()).layout();
 	}
+	
+	private void createAddButton(final QueueTuple parent, final String address, String name) {
+		
+		// create button
+		Button button = new Button((Composite)parent.getControl(), SWT.PUSH);
+		button.setText("Add " + name);
+		button.setFont(JFaceResources.getDialogFont());
+		
+		// add reaction on click
+		button.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent event) {
+				setDefaultMessage();
+				createObject(parent.getParent(), address);
+				renewOperations(parent.getParent());
+			}
+		});
+	}
+	
+	private void createObject(QueueTuple parent, String address) {
+		
+		// create mock object (only for store "address" and "name")
+		PropertiesManipulator prop = new PropertiesManipulator(address);
+		XMLElement temp = new XMLElement();
+		temp.setAddress(address);
+		temp.setName(prop.getSomeElementValue(address, ElementValues.NAME));
+		
+		// add objects to the view
+		addElement(parent, temp);
+		
+		// refresh view
+		parent.getControl().getShell().pack();
+		((Composite)parent.getControl()).layout();
+	}
+	
+	private void createRemoveButton(final QueueTuple target) {
+		
+		// can be object removed?
+		PropertiesManipulator prop = new PropertiesManipulator(target.getAddress());
+		final String required = prop.getSomeElementValue(target.getAddress(), ElementValues.REQUIRED);
+		if (required.startsWith("R") && required.endsWith("1")) {
+			return;
+		}
+		
+		// create button
+		Button button = new Button((Composite)target.getControl(), SWT.PUSH);
+		button.setText("Remove");
+		button.setFont(JFaceResources.getDialogFont());
+				
+		// add reaction on click
+		button.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent event) {
+				
+				setDefaultMessage();
+				
+				// check if object can be removed
+				// if is required and is last one => can't be removed
+				if (required.startsWith("R")) {
+					int count = 0;
+					for (QueueTuple tuple : target.getParent().getChildren()) {
+						if (tuple.getAddress().equals(target.getAddress())) {
+							count++;
+						}
+					}
+					if (count == 1) {
+						// can't be removed
+						setErrorMessage("Element cannot be remove - at least one is required");
+						return;
+					}
+				}
+				
+				// delete from the tree
+				target.getParent().removeChildren(target);
+				
+				// delete from view
+				target.getControl().getParent().dispose();
+				// TODO resize dialog window and reorder objects 
+				
+				renewOperations(target.getParent());
+			}
+		});
+	}
+	
+
+	
+	
 }
+

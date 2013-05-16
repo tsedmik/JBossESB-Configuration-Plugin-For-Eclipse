@@ -256,19 +256,21 @@ public class PropertiesManipulator {
 	 */
 	public static Map<String, String> getElementsUnderElement(Map<String, String> data, String address) {
 		
-		Map<String, String> tempElements = new HashMap<String, String>(data);
+		Map<String, String> tempElements = new HashMap<String, String>();
 		
 		// input control
 		if (data == null || address == null) {
 			return tempElements;
 		}
 		
-		tempElements.remove(address);
-		int addressLength = address.split("/").length;
-		for (String key : data.keySet()) {
+		for (Map.Entry<String, String> entry : data.entrySet()) {
+			String key = entry.getKey();
+			String value = entry.getValue();
+			int addressLength = address.split("/").length;
 			int keyLength = key.split("/").length;
-			if (keyLength > addressLength + 1) {
-				tempElements.remove(key);
+			
+			if (key.startsWith(address) && (addressLength + 1 == keyLength)) {
+				tempElements.put(key, value);
 			}
 		}
 		
