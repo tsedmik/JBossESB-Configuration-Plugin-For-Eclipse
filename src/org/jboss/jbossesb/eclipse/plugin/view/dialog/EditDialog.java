@@ -104,6 +104,9 @@ public class EditDialog extends TitleAreaDialog {
 		super.okPressed();
 	}
 
+	/**
+	 * Clears error message and set standard information message
+	 */
 	private void setDefaultMessage() {
 		
 		setErrorMessage(null);
@@ -116,6 +119,13 @@ public class EditDialog extends TitleAreaDialog {
 		}
 	}
 	
+	/**
+	 * Creates a group object as a container for other objects
+	 * 
+	 * @param parent parent object
+	 * @param name text displays as name of the group
+	 * @return composite object (container) that is child of the group
+	 */
 	private Composite setGroupLayout(Composite parent, String name) {
 		
 		// layout (group)
@@ -133,7 +143,31 @@ public class EditDialog extends TitleAreaDialog {
 	}
 	
 	/**
-	 * Create an OK button with input validation.
+	 * Searches whether the dialog already contains object with defined addresss 
+	 *  
+	 * @param parent parental tree object
+	 * @param address address of searched object
+	 * @return true - object is already displayed, false - otherwise
+	 */
+	private boolean isObjectExists(QueueTuple parent, String address) {
+		
+		if (parent == null || address == null) {
+			return false;
+		}
+		
+		if (parent.getChildren() != null) {
+			for (QueueTuple tuple : parent.getChildren()) {
+				if (tuple.getAddress().equals(address)) {
+					return true;
+				}
+			}
+		}
+		
+		return false;
+	}
+	
+	/**
+	 * Creates an OK button with input validation.
 	 * 
 	 * @param parent Parent.
 	 * @param id Button id.
@@ -190,12 +224,18 @@ public class EditDialog extends TitleAreaDialog {
 	}
 
 	/**
-	 * Save the state of input objects of GUI to the XMLElement data model
+	 * Saves the state of input objects of GUI to the XMLElement data model
 	 */
 	private void saveInput() {
 		// TODO save input to the model
 	}
 
+	/**
+	 * Adds attributes of given element to the dialog
+	 * 
+	 * @param parent parental tree object
+	 * @param element element with data
+	 */
 	private void addAttributes(QueueTuple parent, XMLElement element) {
 		
 		// loading configuration
@@ -247,6 +287,12 @@ public class EditDialog extends TitleAreaDialog {
 		}
 	}
 	
+	/**
+	 * Adds Elements to the dialog
+	 * 
+	 * @param parent parental tree object
+	 * @param element element with data
+	 */
 	private  void addElements(QueueTuple parent, XMLElement element) {
 		
 		// hack for "global settings" only
@@ -265,8 +311,33 @@ public class EditDialog extends TitleAreaDialog {
 		for (XMLElement child : element.getChildren()) {
 			addElement(parent, child);
 		}
+		
+		// add required elements (based on properties file)
+		PropertiesManipulator propManipulator = new PropertiesManipulator(parent.getAddress());
+		Map<String, String> temp = PropertiesManipulator.convertResourceBundleToMap(propManipulator.getResource());
+		Map<String, String> properties = PropertiesManipulator.alterProperties(temp);
+		Map<String, String> tempelements = PropertiesManipulator.getElementsFromMap(properties);
+		Map<String, String> elements = PropertiesManipulator.getElementsUnderElement(tempelements, parent.getAddress());
+		for (Map.Entry<String, String> entry : elements.entrySet()) {
+			String key = entry.getKey();
+			if (propManipulator.getSomeElementValue(key, ElementValues.REQUIRED).startsWith("R")) {
+				if (!isObjectExists(parent, key)) {
+					XMLElement temp2 = new XMLElement();
+					temp2.setAddress(key);
+					temp2.setName(propManipulator.getSomeElementValue(key, ElementValues.NAME));
+					addElement(parent, temp2);
+				}
+			}
+		}
+		
 	}
 	
+	/**
+	 * Adds single element to the dialog
+	 * 
+	 * @param parent parental tree object
+	 * @param element element with data
+	 */
 	private void addElement(QueueTuple parent, XMLElement element) {
 		
 		// layout
@@ -285,6 +356,11 @@ public class EditDialog extends TitleAreaDialog {
 		addOperations(tuple);
 	}
 	
+	/**
+	 * Adds operations with objects to the dialog
+	 * 
+	 * @param parent parental tree object
+	 */
 	private void addOperations(QueueTuple parent) {
 		
 		// layout (group)
@@ -307,21 +383,11 @@ public class EditDialog extends TitleAreaDialog {
 		// compare with current model and add buttons
 		for (String key : elements.keySet()) {
 			
-			// true if element exists in view
-			boolean exists = false;
-			if (parent.getChildren() != null) {
-				for (QueueTuple temp2 : parent.getChildren()) {
-					if (temp2.getAddress().equals(key)) {
-						exists = true;
-					}
-				}
-			}
-			
 			String required = propManipulator.getSomeElementValue(key, ElementValues.REQUIRED).substring(1);
 			String name = propManipulator.getSomeElementValue(key, ElementValues.NAME);
 			
 			// add "add buttons" if can
-			if (exists) {
+			if (isObjectExists(parent, key)) {
 				if (required.equals("1N") || required.equals("0N")) {
 					if (composite == null) {
 						composite = setGroupLayout((Composite)parent.getControl(), "Operations");
@@ -341,6 +407,11 @@ public class EditDialog extends TitleAreaDialog {
 		}
 	}
 	
+	/**
+	 * Call this method after every object manipulation (addition, remove). Renewss allowable operations.
+	 * 
+	 * @param parent parental tree object
+	 */
 	private void renewOperations(QueueTuple parent) {
 		
 		// dispose old group with operations
@@ -360,6 +431,13 @@ public class EditDialog extends TitleAreaDialog {
 		((Composite)parent.getControl()).layout();
 	}
 	
+	/**
+	 * Creates a button for adding objects to the form
+	 * 
+	 * @param parent parental tree object
+	 * @param address defined which object is added based on address in XML file
+	 * @param name button label
+	 */
 	private void createAddButton(final QueueTuple parent, final String address, String name) {
 		
 		// create button
@@ -377,6 +455,12 @@ public class EditDialog extends TitleAreaDialog {
 		});
 	}
 	
+	/**
+	 * Creates object and puts it into the dialog
+	 * 
+	 * @param parent parental tree object
+	 * @param address defined which object is added based on address in XML file
+	 */
 	private void createObject(QueueTuple parent, String address) {
 		
 		// create mock object (only for store "address" and "name")
@@ -393,6 +477,11 @@ public class EditDialog extends TitleAreaDialog {
 		((Composite)parent.getControl()).layout();
 	}
 	
+	/**
+	 * Adds remove button into the dialog
+	 * 
+	 * @param target parental tree object
+	 */
 	private void createRemoveButton(final QueueTuple target) {
 		
 		// can be object removed?
