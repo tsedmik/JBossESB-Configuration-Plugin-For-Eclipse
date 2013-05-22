@@ -1,6 +1,9 @@
 package org.jboss.jbossesb.eclipse.plugin.view.dialog;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
+import java.util.Stack;
 
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.dialogs.TitleAreaDialog;
@@ -12,11 +15,13 @@ import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.swt.widgets.Spinner;
 
 import org.eclipse.swt.widgets.Text;
 import org.jboss.jbossesb.eclipse.plugin.controller.PropertiesManipulator;
@@ -60,7 +65,7 @@ public class EditDialog extends TitleAreaDialog {
 		addAttributes(root, data); // root XMLElement attributes
 		addElements(root, data); // add child elements
 		addOperations(root); // add edit options
-		
+	    	    
 		return parent;
 	}
 	
@@ -206,28 +211,215 @@ public class EditDialog extends TitleAreaDialog {
 	 * @return true - input is valid, false - otherwise
 	 */
 	private boolean isValidInput() {
-		// TODO add form validation
-		
-		boolean valid = true;
-		/*
-		if (firstNameText.getText().length() == 0) {
-			setErrorMessage("Please maintain the first name");
-			valid = false;
+				
+		// go through the tree representation of the element
+		Stack<QueueTuple> stack = new Stack<QueueTuple>();
+		stack.push(root);
+		while (!stack.isEmpty()) {
+			
+			QueueTuple tuple = stack.pop();
+			
+			// Skip operations group 
+			if (tuple.getAddress().equals("o")) {
+				continue;
+			}
+			
+			if (tuple.getChildren() == null) {
+				
+				// validation (it's an attribute)
+				String value = extractAttributeValueFromControl(tuple.getControl());
+				if (!isValidValue(value, tuple.getAddress())) {
+					return false;
+				}
+			} else {
+				for (QueueTuple temp : tuple.getChildren()) {
+					stack.push(temp);
+				}
+			}
 		}
-		if (lastNameText.getText().length() == 0) {
-			setErrorMessage("Please maintain the last name");
-			valid = false;
-		}
-		*/
-		return valid;
 		
+		return true;	
+	}
+	
+	/**
+	 * Extract String representation of value stored in the Control
+	 * 
+	 * @param control View object (Button, Combo, Text, Spinner)
+	 * @return value stored in the Control, null - in case that control doesn't contains any information
+	 */
+	private String extractAttributeValueFromControl(Control control) {
+		
+		if (control == null) {
+			return null;
+		}
+		
+		if (control instanceof Text) {
+			return ((Text) control).getText();
+		} else if (control instanceof Spinner) {
+			return ((Spinner) control).getText();
+		} else if (control instanceof Combo) {
+			return ((Combo) control).getText();
+		} else if (control instanceof Button) {
+			Button temp = (Button) control;
+			if (temp.getSelection()) {
+				return "true";
+			} else {
+				return "false";
+			}
+		}
+		
+		return null;
+	}
+	
+	/**
+	 * Check whether value is in the definition set of the attribute given by the XML address.
+	 * If value isn't valid, set the error message.
+	 * 
+	 * @param value value of the attribute
+	 * @param address XML address of processed attribute
+	 * @return true - value is valid, false - otherwise
+	 */
+	private boolean isValidValue(String value, String address) {
+		
+		// load configuration
+		PropertiesManipulator prop = new PropertiesManipulator(address);
+		
+		// Text validation (String255)
+		if (prop.getSomeAttributeValue(address, AttributeValues.TYPE).equals("String255") &&
+				value.length() > 255) {
+			String object = prop.getSomeAttributeValue(address, AttributeValues.NAME);
+			setErrorMessage(object + " can be only 255 characters long!");
+			return false;
+		}
+		
+		// Number validation
+		if (prop.getSomeAttributeValue(address, AttributeValues.TYPE).equals("int") ||
+				prop.getSomeAttributeValue(address, AttributeValues.TYPE).equals("Decimal")) {
+			
+			try {
+				if (Integer.parseInt(value) < 0) {
+					String object = prop.getSomeAttributeValue(address, AttributeValues.NAME);
+					setErrorMessage(object + " must be a positive number!");
+					return false;
+				}
+			} catch (NumberFormatException e) {
+				String object = prop.getSomeAttributeValue(address, AttributeValues.NAME);
+				setErrorMessage(object + " must be a number!");
+				return false;
+			}
+		}
+		
+		// Required value validation
+		if (prop.getSomeAttributeValue(address, AttributeValues.REQUIRED).startsWith("R") && 
+				value.length() == 0) {
+			String object = prop.getSomeAttributeValue(address, AttributeValues.NAME);
+			setErrorMessage(object + " is required (must be filled)!");
+			return false;
+		}
+		
+		return true;
 	}
 
 	/**
 	 * Saves the state of input objects of GUI to the XMLElement data model
 	 */
 	private void saveInput() {
-		// TODO save input to the model
+		
+		// TODO check if attribute value was changed (against model)
+		// TODO check if elements were changed (against model)
+		
+		// process root of the tree
+		List<XMLAttribute> attributes = new ArrayList<XMLAttribute>();
+		List<XMLElement> elements = new ArrayList<XMLElement>();
+		for (QueueTuple tuple : root.getChildren()) {
+			
+			// skip operations group
+			if (tuple.getAddress().equals("o")) {
+				continue;
+			}
+			
+			// attributes
+			if (tuple.getChildren() == null) {
+				XMLAttribute attr = createAttribute(tuple);
+				attributes.add(attr);
+			}
+			
+			// add elements to the processing stack
+			else {
+				XMLElement elem = createElement(tuple);
+				elements.add(elem);
+			}
+		}
+		data.setAttributes(attributes);
+		data.setChildren(elements);
+	}
+	
+	/**
+	 * Create a new XMLAttribute object based on QueueTuple (view object).
+	 * 
+	 * @param tuple view object (must contains Control with user data)
+	 * @return new XMLAttribute
+	 */
+	private XMLAttribute createAttribute(QueueTuple tuple) {
+		
+		PropertiesManipulator prop = new PropertiesManipulator(tuple.getAddress());
+		String type = prop.getSomeAttributeValue(tuple.getAddress(), AttributeValues.TYPE);
+		boolean required = prop.getSomeAttributeValue(tuple.getAddress(), AttributeValues.REQUIRED).startsWith("R") ? true : false;
+		
+		String allowedValues = prop.getSomeAttributeValue(tuple.getAddress(), AttributeValues.ALLOWED_VALUES);
+		List<String> allowedValues2 = new ArrayList<String>();
+		String[] temp = allowedValues.split(",");
+		for (int i = 0; i < temp.length; i++) {
+			allowedValues2.add(temp[i]);
+		}
+		
+		String name = prop.getSomeAttributeValue(tuple.getAddress(), AttributeValues.NAME);
+		String hint = prop.getSomeAttributeValue(tuple.getAddress(), AttributeValues.HINT);
+		
+		temp = tuple.getAddress().split("/");
+		String xmlName = temp[temp.length - 1];
+		
+		String value = extractAttributeValueFromControl(tuple.getControl());
+		
+		return new XMLAttribute(type, required, allowedValues2, value, name, hint, xmlName);
+	}
+	
+	/**
+	 * Create a new XMLElement and all children XMLElements and XMLAttributes (with recurse calls)
+	 * 
+	 * @param tuple identification of element
+	 * @return new XMLElement
+	 */
+	private XMLElement createElement(QueueTuple tuple) {
+		
+		// create new element
+		XMLElement newElement = new XMLElement();
+		newElement.setAddress(tuple.getAddress());
+		PropertiesManipulator prop = new PropertiesManipulator(tuple.getAddress());
+		newElement.setHint(prop.getSomeElementValue(tuple.getAddress(), ElementValues.HINT));
+		newElement.setName(prop.getSomeElementValue(tuple.getAddress(), ElementValues.NAME));
+		
+		// recurse - create children (elements and attributes)
+		List<XMLAttribute> attributes = new ArrayList<XMLAttribute>();
+		List<XMLElement> elements = new ArrayList<XMLElement>();
+		for (QueueTuple temp : tuple.getChildren()) {
+			// skip operations group
+			if (temp.getAddress().equals("o")) {
+				continue;
+			}
+			// attributes
+			if (temp.getChildren() == null) {
+				attributes.add(createAttribute(temp));
+			}
+			// add elements to the processing stack
+			else {
+				elements.add(createElement(temp));
+			}
+		}
+		newElement.setAttributes(attributes);
+		newElement.setChildren(elements);
+		
+		return newElement;
 	}
 
 	/**
@@ -250,7 +442,7 @@ public class EditDialog extends TitleAreaDialog {
 		layout.horizontalSpacing = GridData.FILL;
 		composite.setLayout(layout);
 		
-		// get all attributes attached the element
+		// get all attributes attached to the element
 		Map<String, String> attributes = PropertiesManipulator.getAttributesToElement(properties, parent.getAddress());
 		
 		// print attributes
@@ -264,28 +456,140 @@ public class EditDialog extends TitleAreaDialog {
 				label.setText(propManipulator.getSomeAttributeValue(address, AttributeValues.NAME));
 			}
 			
-			// create text field
-			// TODO distinct different data types of attributes and allow only such values belongs in the definition set
-			Text text = new Text(composite, SWT.BORDER);
-			text.setLayoutData(new GridData(GridData.FILL, GridData.FILL, true, false));
-			
-			// add to the tree representation of dialog
-			QueueTuple object = new QueueTuple(address, text, null, parent);
-			parent.addChildren(object);
-			
-			// set data from the model (if exists)
-			String[] temp = address.split("/");
-			String attributeXMLName = temp[temp.length - 1];
-			XMLAttribute attribute = element.getAttribute(attributeXMLName);
-			if (attribute != null && attribute.getValue() != null) {
-				text.setText(attribute.getValue());
+			// create input fields
+			String type = propManipulator.getSomeAttributeValue(address, AttributeValues.TYPE);
+			String allowedValues = propManipulator.getSomeAttributeValue(address, AttributeValues.ALLOWED_VALUES);
+			Control input = null;
+			if (allowedValues.length() > 0) {
+				input = createComboInput(composite, address, element, allowedValues);
 			} else {
-
-				// TODO if no data exists set a default value (save only if a user confirms it)
+				if (type.equals("boolean")) {
+					input = createCheckboxInput(composite, address, element);
+				} else if (type.equals("int") || type.equals("Decimal")) {
+					// TODO what difference is between int and Decimal?			
+					input = createSpinnerInput(composite, address, element);
+				} else {
+					input = createTextInput(composite, address, element);
+				}
 				
 			}
+			
+			// add to the tree representation of dialog
+			QueueTuple object = new QueueTuple(address, input, null, parent);
+			parent.addChildren(object);
 		}
 	}
+	
+	/**
+	 * Creates text input for method addAttributes.
+	 * 
+	 * @param parent parental view object
+	 * @param address XML address of added object
+	 * @param data XML data
+	 * @return created object
+	 */
+	private Control createTextInput(Composite parent, String address, XMLElement element) {
+		
+		Text text = new Text(parent, SWT.BORDER);
+		text.setLayoutData(new GridData(GridData.FILL, GridData.FILL, true, false));
+		text.setText(extractAttibuteValueFromModel(address, element));
+		
+		return text;
+	}
+	
+	/**
+	 * Create combo box input for method addAttributes
+	 * 
+	 * @param parent parental view object
+	 * @param address XML address of added object
+	 * @param element XML data
+	 * @param allowedValues allowed values separate with ','
+	 * @return created object
+	 */
+	private Control createComboInput(Composite parent, String address, XMLElement element, String allowedValues) {
+		
+		Combo combo = new Combo(parent, SWT.DROP_DOWN | SWT.READ_ONLY);
+		combo.setLayoutData(new GridData(GridData.FILL, GridData.FILL, true, false));
+		String[] values = allowedValues.split(",");
+		for (int i = 0; i < values.length; i++) {
+			combo.add(values[i]);
+		}
+		
+		// set data (if exists)
+		String value = extractAttibuteValueFromModel(address, element);
+		if (!value.equals("")) {
+			combo.setText(value);
+		}
+		
+		return combo;
+	}
+	
+	/**
+	 * Create check box input for method addAttributes
+	 * 
+	 * @param parent parental view object
+	 * @param address XML address of added object
+	 * @param element XML data
+	 * @return created object
+	 */
+	private Control createCheckboxInput(Composite parent, String address, XMLElement element) {
+		Button button = new Button(parent, SWT.CHECK);
+		button.setLayoutData(new GridData(GridData.FILL, GridData.FILL, true, false));
+		
+		// set data (if exists)
+		String value = extractAttibuteValueFromModel(address, element);
+		if (value.equals("true")) {
+			button.setSelection(true);
+		}
+		
+		return button;
+	}
+	
+	/**
+	 * Create spinner input for method addAttributes
+	 * 
+	 * @param parent parental view object
+	 * @param address XML address of added object
+	 * @param element XML data
+	 * @return created object
+	 */
+	private Control createSpinnerInput(Composite parent, String address, XMLElement element) {
+		
+		Spinner spinner = new Spinner(parent, 0);
+		spinner.setLayoutData(new GridData(GridData.FILL, GridData.FILL, true, false));
+		
+		// set data (if exists)
+		String value = extractAttibuteValueFromModel(address, element);
+		if (!value.equals("")) {
+			spinner.setSelection(Integer.parseInt(value));
+		}
+		
+		return spinner;
+		
+	}
+	
+	/**
+	 * Method accesses attribute value of XML element.
+	 * 
+	 * @param address specify searched attribute with its XML address
+	 * @param element data that are searched.
+	 * @return attribute value, if exists. "" - otherwise
+	 */
+	private String extractAttibuteValueFromModel(String address, XMLElement element) {
+		
+		String value = "";
+		String[] temp = address.split("/");
+		String attributeXMLName = temp[temp.length - 1];
+		XMLAttribute attribute = element.getAttribute(attributeXMLName);
+		if (attribute != null && attribute.getValue() != null) {
+			value =  attribute.getValue();
+		} else {
+			// TODO if no data exists set a default value (save only if a user confirms it)
+		}
+		
+		return value;
+	}
+
 	
 	/**
 	 * Adds Elements to the dialog
@@ -523,7 +827,6 @@ public class EditDialog extends TitleAreaDialog {
 				
 				// delete from view
 				target.getControl().getParent().dispose();
-				// TODO resize dialog window and reorder objects 
 				
 				renewOperations(target.getParent());
 			}
@@ -534,4 +837,3 @@ public class EditDialog extends TitleAreaDialog {
 	
 	
 }
-

@@ -217,6 +217,11 @@ public class PropertiesManipulator {
 		}
 				
 		String[] temp = resource.getString(shortAddress).split("#");
+		
+		// hint mustn't be set
+		if (temp.length == value.ordinal()) {
+			return "";
+		}
 				
 		return temp[value.ordinal()];
 	}
@@ -241,6 +246,11 @@ public class PropertiesManipulator {
 		}
 						
 		String[] temp = resource.getString(shortAddress).split("#");
+		
+		// hint mustn't be set
+		if (temp.length == value.ordinal()) {
+			return "";
+		}
 						
 		return temp[value.ordinal()];
 	}

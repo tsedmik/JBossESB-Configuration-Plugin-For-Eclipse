@@ -69,7 +69,9 @@ public class XMLElement {
 	}
 
 	public void setChildren(List<XMLElement> children) {
+		List<XMLElement> oldChildren = this.children;
 		this.children = children;
+		listeners.firePropertyChange("children changed", oldChildren, children);
 	}
 
 	public String getAddress() {
@@ -116,7 +118,9 @@ public class XMLElement {
 	}
 	
 	public void setAttributes(List<XMLAttribute> attributes) {
+		List<XMLAttribute> oldAttributes = this.attributes;
 		this.attributes = attributes;
+		listeners.firePropertyChange("attributes changed", oldAttributes, attributes);
 	}
 
 	public Rectangle getRectangle() {
@@ -124,8 +128,9 @@ public class XMLElement {
 	}
 
 	public void setRectangle(Rectangle rectangle) {
+		Rectangle oldRectangle = this.rectangle;
 		this.rectangle = rectangle;
-		listeners.firePropertyChange("move", null, rectangle);
+		listeners.firePropertyChange("move", oldRectangle, rectangle);
 	}
 	
 	public boolean removeChild(XMLElement child) {
