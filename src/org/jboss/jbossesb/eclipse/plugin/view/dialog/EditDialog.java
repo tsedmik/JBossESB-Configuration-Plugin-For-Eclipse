@@ -339,19 +339,35 @@ public class EditDialog extends TitleAreaDialog {
 			}
 			
 			// attributes
-			if (tuple.getChildren() == null) {
+			PropertiesManipulator prop = new PropertiesManipulator(tuple.getAddress());
+			if (prop.getSomeAttributeValue(tuple.getAddress(), AttributeValues.ATTR_OR_ELEM).equals("A")) {
 				XMLAttribute attr = createAttribute(tuple);
 				attributes.add(attr);
-			}
+			} 
 			
 			// add elements to the processing stack
-			else {
+			else if (tuple.getChildren() != null) {
 				XMLElement elem = createElement(tuple);
 				elements.add(elem);
 			}
 		}
 		data.setAttributes(attributes);
-		data.setChildren(elements);
+		
+		// hack for Globals setting
+		if (data.getAddress().equals("/jbossesb")) {
+			for (XMLElement elem : data.getChildren()) {
+				if (elem.getAddress().equals("/jbossesb/globals")) {
+					data.removeChild(elem);
+					break;
+				}
+			}
+			if (!elements.isEmpty()) {
+				data.addChildElement(elements.get(0));
+			}
+		} else {
+			data.setChildren(elements);
+		}
+		
 	}
 	
 	/**
@@ -403,16 +419,19 @@ public class EditDialog extends TitleAreaDialog {
 		List<XMLAttribute> attributes = new ArrayList<XMLAttribute>();
 		List<XMLElement> elements = new ArrayList<XMLElement>();
 		for (QueueTuple temp : tuple.getChildren()) {
+			
 			// skip operations group
 			if (temp.getAddress().equals("o")) {
 				continue;
 			}
+			
 			// attributes
-			if (temp.getChildren() == null) {
+			if (prop.getSomeAttributeValue(temp.getAddress(), AttributeValues.ATTR_OR_ELEM).equals("A")) {
 				attributes.add(createAttribute(temp));
 			}
+			
 			// add elements to the processing stack
-			else {
+			else if (temp.getChildren() != null) {
 				elements.add(createElement(temp));
 			}
 		}

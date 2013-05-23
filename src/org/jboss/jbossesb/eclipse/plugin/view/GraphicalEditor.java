@@ -89,6 +89,7 @@ public class GraphicalEditor extends GraphicalEditorWithFlyoutPalette {
 	  * call super implementation.
 	  */
 	@Override public void commandStackChanged(EventObject event) {
+		// FIXME need to save only if some data changed
 		firePropertyChange(PROP_DIRTY);
 		super.commandStackChanged(event);
 	}
@@ -101,19 +102,24 @@ public class GraphicalEditor extends GraphicalEditorWithFlyoutPalette {
 	private void setInitialPosition(XMLDocument doc) {
 		
 		int start = 40;
-		for (XMLElement elem : doc.getProviders()) {
-			int height = 28 + XMLElementManipulator.getBuses(elem).size() * 28;
-			Rectangle layout = new Rectangle(2, start, 300, height);
-			start = start + height + 8;
-			elem.setRectangle(layout);
+		if (doc.getProviders() != null) {
+			for (XMLElement elem : doc.getProviders()) {
+				int height = 28 + XMLElementManipulator.getBuses(elem).size() * 28;
+				Rectangle layout = new Rectangle(2, start, 300, height);
+				start = start + height + 8;
+				elem.setRectangle(layout);
+			}
 		}
 		
+		
 		start = 40;
-		for (XMLElement elem : doc.getServices()) {
-			int height = 50;
-			Rectangle layout = new Rectangle(400, start, 200, height);
-			start = start + height + 15;
-			elem.setRectangle(layout);
+		if (doc.getServices() != null) {
+			for (XMLElement elem : doc.getServices()) {
+				int height = 50;
+				Rectangle layout = new Rectangle(400, start, 200, height);
+				start = start + height + 15;
+				elem.setRectangle(layout);
+			}
 		}
 	}
 }

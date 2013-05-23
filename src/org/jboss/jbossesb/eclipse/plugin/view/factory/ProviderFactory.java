@@ -1,23 +1,33 @@
 package org.jboss.jbossesb.eclipse.plugin.view.factory;
 
 import org.eclipse.gef.requests.CreationFactory;
+import org.jboss.jbossesb.eclipse.plugin.controller.PropertiesManipulator;
 import org.jboss.jbossesb.eclipse.plugin.model.XMLElement;
+import org.jboss.jbossesb.eclipse.plugin.view.dialog.ElementValues;
 
-//TODO Add JavaDoc
+/**
+ * Class create a new XMLElement (provider).
+ * 
+ * @author Tomas Sedmik, tomas.sedmik@gmail.com
+ * @since 2013-05-23
+ */
 public class ProviderFactory implements CreationFactory {
+	
+	private String address = null;
 	
 	public ProviderFactory(String provider) {
 		super();
-		// TODO set correct provider
+		address = "/jbossesb/providers/" + provider;
 	}
 
 	@Override
 	public Object getNewObject() {
 		
-		// TODO set some basic attributes - address
-		// TODO show dialog here or step before?
 		XMLElement provider = new XMLElement();
-		provider.setAddress("/jbossesb/providers");
+		provider.setAddress(address);
+		PropertiesManipulator prop = new PropertiesManipulator(address);
+		provider.setName(prop.getSomeElementValue(address, ElementValues.NAME));
+		provider.setHint(prop.getSomeElementValue(address, ElementValues.HINT));
 		
 		return provider;
 	}

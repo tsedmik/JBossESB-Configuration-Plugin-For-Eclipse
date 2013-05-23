@@ -58,8 +58,7 @@ public class XMLDocument {
 		
 		// remove the given element
 		if (temp.removeChild(element)) {
-			log.log(Level.INFO, "Deletion was successful!");
-			// FIXME repair removing objects => remove right object (some problem with observer?) 
+			log.log(Level.INFO, "Deletion was successful!"); 
 			listeners.firePropertyChange("remove", element, null);
 		} else {
 			log.log(Level.SEVERE, "Object not found! Deletion cannot be perform.");
@@ -67,12 +66,23 @@ public class XMLDocument {
 	}
 
 	public void addProvider(XMLElement provider) {
-		List<XMLElement> children = jbossesb.getChildren();
-		for (XMLElement child : children) {
-			if (child.getAddress().equals("/jbossesb/providers")) {
-				child.addChildElement(provider);
+		
+		// check if providers section is exists, if not create it
+		if (getProviders() == null) {
+			XMLElement providers = new XMLElement();
+			providers.setAddress("/jbossesb/providers");
+			providers.setName("Providers");
+			jbossesb.addChildElement(providers);
+			providers.addChildElement(provider);
+		} else {
+			List<XMLElement> children = jbossesb.getChildren();
+			for (XMLElement child : children) {
+				if (child.getAddress().equals("/jbossesb/providers")) {
+					child.addChildElement(provider);
+				}
 			}
 		}
+		
 		listeners.firePropertyChange("add", null, provider);
 	}
 	

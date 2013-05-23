@@ -19,6 +19,7 @@ public class ProviderFigure extends Figure {
 	private Label label;
 	private List<ProviderBusFigure> buses;
 
+
 	/**
 	 * Create figure represents a JBossESB Provider (without buses and set Label).
 	 */

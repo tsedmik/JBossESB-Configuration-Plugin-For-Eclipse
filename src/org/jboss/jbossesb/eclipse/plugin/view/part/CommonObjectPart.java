@@ -54,6 +54,7 @@ public abstract class CommonObjectPart extends AbstractGraphicalEditPart impleme
 	    	Dialog dialog = new EditDialog(new Shell(), (XMLElement)getModel());
 	    	if(dialog.open() == Window.OK) {
 	    		log.log(Level.INFO, "Object \"" + ((XMLElement) getModel()).getName() + "\" was successfuly edited.");
+	    		// FIXME set editor as DIRTY (need to be save after edit)
 	        }else{
 	            log.log(Level.INFO, "Editing of object \"" + ((XMLElement) getModel()).getName() + "\" was canceled.");
 	        }
