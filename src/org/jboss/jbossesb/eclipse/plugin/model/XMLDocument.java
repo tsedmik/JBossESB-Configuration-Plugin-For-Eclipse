@@ -87,12 +87,23 @@ public class XMLDocument {
 	}
 	
 	public void addService(XMLElement service) {
-		List<XMLElement> children = jbossesb.getChildren();
-		for (XMLElement child : children) {
-			if (child.getAddress().equals("/jbossesb/services")) {
-				child.addChildElement(service);
+		
+		// check if services section is exists, if not create it
+		if (getServices() == null) {
+			XMLElement services = new XMLElement();
+			services.setAddress("/jbossesb/services");
+			services.setName("Services");
+			jbossesb.addChildElement(services);
+			services.addChildElement(service);
+		} else {
+			List<XMLElement> children = jbossesb.getChildren();
+			for (XMLElement child : children) {
+				if (child.getAddress().equals("/jbossesb/services")) {
+					child.addChildElement(service);
+				}
 			}
 		}
+		
 		listeners.firePropertyChange("add", null, service);
 	}
 	

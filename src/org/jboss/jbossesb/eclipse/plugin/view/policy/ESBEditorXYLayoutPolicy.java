@@ -9,21 +9,45 @@ import org.jboss.jbossesb.eclipse.plugin.model.XMLDocument;
 import org.jboss.jbossesb.eclipse.plugin.model.XMLElement;
 import org.jboss.jbossesb.eclipse.plugin.view.command.ChangeConstraintCommand;
 import org.jboss.jbossesb.eclipse.plugin.view.command.CreateProviderCommand;
+import org.jboss.jbossesb.eclipse.plugin.view.command.CreateServiceCommand;
 
-//TODO Add JavaDoc
+/**
+ * Default policy that create objects and perform their movement
+ * 
+ * @author Tomas Sedmik, tomas.sedmik@gmail.com
+ * @since 2013-05-23
+ */
 public class ESBEditorXYLayoutPolicy extends XYLayoutEditPolicy {
 
 	@Override
 	protected Command getCreateCommand(CreateRequest request) {
+		
 		Command retVal = null;
-		// TODO adding more objects than providers only! (distinctions based on address)
-		if (request.getNewObject() instanceof XMLElement) {
-			CreateProviderCommand command = new CreateProviderCommand();
-			command.setLocation(request.getLocation());
-			command.setParent((XMLDocument) (getHost().getModel()));
-			command.setThing((XMLElement) (request.getNewObject()));
-			retVal = command;
+		Object object = request.getNewObject();
+		
+		if (object instanceof XMLElement) {
+			
+			XMLElement temp = (XMLElement) object;
+			
+			// provider
+			if (temp.getAddress().startsWith("/jbossesb/providers")) {
+				CreateProviderCommand command = new CreateProviderCommand();
+				command.setLocation(request.getLocation());
+				command.setParent((XMLDocument) (getHost().getModel()));
+				command.setThing((XMLElement) (request.getNewObject()));
+				retVal = command;
+			}
+			
+			// service
+			else if (temp.getAddress().startsWith("/jbossesb/services")) {
+				CreateServiceCommand command = new CreateServiceCommand();
+				command.setLocation(request.getLocation());
+				command.setDocument((XMLDocument) (getHost().getModel()));
+				command.setService((XMLElement) (request.getNewObject()));
+				retVal = command;
+			}
 		}
+		
 		return retVal;
 	}
 	
