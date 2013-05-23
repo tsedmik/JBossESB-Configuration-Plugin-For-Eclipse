@@ -7,11 +7,11 @@
             class="org.jboss.jbossesb.eclipse.plugin.view.GraphicalEditor"
             contributorClass="org.jboss.jbossesb.eclipse.plugin.view.GraphicalEditorActionBarContributor"
             default="true"
-            filenames="jbossesb.xml"
+            filenames="jboss-esb.xml"
             icon="META-INF/icon.gif"
             id="org.jboss.jbossesb.eclipse.plugin.editor"
             matchingStrategy="org.jboss.jbossesb.eclipse.plugin.configuration.MatchingStrategy"
-            name="JBossESB GEF Editor">
+            name="JBossESB Graphical Editor">
       </editor>
    </extension>
 

@@ -32,6 +32,7 @@ public class GraphicalEditor extends GraphicalEditorWithFlyoutPalette {
 	private XMLDocument document;
 
 	public GraphicalEditor() {
+		super();
 		setEditDomain(new DefaultEditDomain(this)); 
 	}
 
