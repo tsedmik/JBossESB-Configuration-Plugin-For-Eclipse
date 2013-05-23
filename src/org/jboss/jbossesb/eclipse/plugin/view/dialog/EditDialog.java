@@ -341,6 +341,13 @@ public class EditDialog extends TitleAreaDialog {
 			// attributes
 			PropertiesManipulator prop = new PropertiesManipulator(tuple.getAddress());
 			if (prop.getSomeAttributeValue(tuple.getAddress(), AttributeValues.ATTR_OR_ELEM).equals("A")) {
+				
+				// if value of attribute is null skip
+				String value = extractAttributeValueFromControl(tuple.getControl());
+				if (value == null || value.equals("")) {
+					continue;
+				}
+				
 				XMLAttribute attr = createAttribute(tuple);
 				attributes.add(attr);
 			} 
