@@ -65,7 +65,7 @@ public class EditDialog extends TitleAreaDialog {
 		addAttributes(root, data); // root XMLElement attributes
 		addElements(root, data); // add child elements
 		addOperations(root); // add edit options
-	    	    
+		
 		return parent;
 	}
 	

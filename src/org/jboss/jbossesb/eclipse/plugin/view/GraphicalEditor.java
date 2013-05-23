@@ -2,6 +2,8 @@ package org.jboss.jbossesb.eclipse.plugin.view;
 
 import java.io.File;
 import java.util.EventObject;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -9,6 +11,8 @@ import org.eclipse.draw2d.geometry.Rectangle;
 import org.eclipse.gef.DefaultEditDomain;
 import org.eclipse.gef.palette.PaletteRoot;
 import org.eclipse.gef.ui.parts.GraphicalEditorWithFlyoutPalette;
+import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.PartInitException;
@@ -19,6 +23,7 @@ import org.jboss.jbossesb.eclipse.plugin.controller.XMLManipulatorImpl;
 import org.jboss.jbossesb.eclipse.plugin.model.XMLDocument;
 import org.jboss.jbossesb.eclipse.plugin.model.XMLElement;
 import org.jboss.jbossesb.eclipse.plugin.view.factory.EditorPartFactory;
+import org.jboss.jbossesb.eclipse.plugin.view.part.CommonObjectPart;
 
 /**
  * Basic class of the graphical editor.
@@ -30,6 +35,9 @@ public class GraphicalEditor extends GraphicalEditorWithFlyoutPalette {
 
 	private XMLManipulator manipulator;
 	private XMLDocument document;
+	
+	private boolean isCorrupt = false;
+	private static Logger log = Logger.getLogger(CommonObjectPart.class.getName());
 
 	public GraphicalEditor() {
 		super();
@@ -42,15 +50,16 @@ public class GraphicalEditor extends GraphicalEditorWithFlyoutPalette {
 		try {
 			getGraphicalViewer().setContents(document);
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			log.log(Level.SEVERE, "Problem during graphic initialization!", e);
 		}
 	}
 
 	@Override
 	protected void configureGraphicalViewer() {
 		super.configureGraphicalViewer();
-		getGraphicalViewer().setEditPartFactory(new EditorPartFactory());
+		if (!isCorrupt) {
+			getGraphicalViewer().setEditPartFactory(new EditorPartFactory());
+		}
 	}
 
 	@Override
@@ -60,13 +69,10 @@ public class GraphicalEditor extends GraphicalEditorWithFlyoutPalette {
 
 	@Override
 	public void doSave(IProgressMonitor arg0) {
-		//TODO Add logging
-		//TODO Add control on null value of document
 		try {
 			manipulator.saveConfiguration(document);
 		} catch (XMLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			log.log(Level.SEVERE, "Problem during saving occured!", e);
 		}
 	}
 
@@ -79,8 +85,8 @@ public class GraphicalEditor extends GraphicalEditorWithFlyoutPalette {
 		try {
 			document = manipulator.loadConfiguration();
 		} catch (XMLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			MessageDialog.openError(new Shell(), "Error", "The File is corrupted (it isn't well formed JBoss ESB configuration file.)");
+			log.log(Level.INFO, "Loaded file is corrupt (isn't a well formed JBoss ESB Configuration file)!");
 		}
 		setInitialPosition(document);
 	}

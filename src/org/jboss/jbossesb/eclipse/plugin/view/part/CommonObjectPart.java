@@ -51,6 +51,7 @@ public abstract class CommonObjectPart extends AbstractGraphicalEditPart impleme
 		
 		// double click on a figure
 	    if(req.getType() == RequestConstants.REQ_OPEN) {
+	    	
 	    	Dialog dialog = new EditDialog(new Shell(), (XMLElement)getModel());
 	    	if(dialog.open() == Window.OK) {
 	    		log.log(Level.INFO, "Object \"" + ((XMLElement) getModel()).getName() + "\" was successfuly edited.");
@@ -58,6 +59,7 @@ public abstract class CommonObjectPart extends AbstractGraphicalEditPart impleme
 	        }else{
 	            log.log(Level.INFO, "Editing of object \"" + ((XMLElement) getModel()).getName() + "\" was canceled.");
 	        }
+	    	
 	    } 
 	}
 }

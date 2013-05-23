@@ -24,12 +24,14 @@ public class GraphicalEditorPalette extends PaletteRoot {
 	PaletteGroup head;
 	PaletteGroup provider;
 	PaletteGroup service;
+	PaletteGroup connection;
 
 	public GraphicalEditorPalette() {
 		addGroup();
 		addSelectionTool();
 		addProviderTool();
 		addServiceTool();
+		addConnectionTool();
 	}
 	
 	private void addGroup() {
@@ -41,6 +43,10 @@ public class GraphicalEditorPalette extends PaletteRoot {
 		add(new PaletteSeparator());
 		service = new PaletteGroup("Service Controls");
 		add(service);
+		add(new PaletteSeparator());
+		connection = new PaletteGroup("Listeners Controls");
+		add(connection);
+		
 	}
 
 	private void addSelectionTool() {
@@ -65,5 +71,10 @@ public class GraphicalEditorPalette extends PaletteRoot {
 	private void addServiceTool() {
 		CreationToolEntry entry = new CreationToolEntry("Service", "Create a new Service", new ServiceFactory(), null, null);
 		service.add(entry);
+	}
+	
+	private void addConnectionTool() {
+		CreationToolEntry entry = new CreationToolEntry("Connection", "Create a new Connection", new ServiceFactory(), null, null);
+		connection.add(entry);
 	}
 }
