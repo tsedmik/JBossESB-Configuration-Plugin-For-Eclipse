@@ -8,7 +8,7 @@ import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.ui.actions.ActionFactory;
 
 /**
- * Action Bar
+ * Action Bar.
  * 
  * @author Tomas Sedmik, tomas.sedmik@gmail.com
  * @since 2013-04-06

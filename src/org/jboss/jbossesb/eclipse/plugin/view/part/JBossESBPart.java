@@ -4,6 +4,12 @@ import org.eclipse.draw2d.IFigure;
 import org.eclipse.draw2d.geometry.Rectangle;
 import org.jboss.jbossesb.eclipse.plugin.view.figure.JBossESBFigure;
 
+/**
+ * Controller for the "Global Settings" figure in the editor.
+ * 
+ * @author Tomas Sedmik, tomas.sedmik@gmail.com
+ * @since 2013-05-26
+ */
 public class JBossESBPart extends CommonObjectPart {
 	
 	@Override
@@ -13,7 +19,7 @@ public class JBossESBPart extends CommonObjectPart {
 
 	@Override
 	protected void createEditPolicies() {
-		// TODO Auto-generated method stub	
+		// no policies needed
 	}
 	
 	@Override

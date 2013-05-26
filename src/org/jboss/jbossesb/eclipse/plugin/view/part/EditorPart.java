@@ -16,7 +16,7 @@ import org.jboss.jbossesb.eclipse.plugin.model.XMLElement;
 import org.jboss.jbossesb.eclipse.plugin.view.policy.ESBEditorXYLayoutPolicy;
 
 /**
- * TODO JavaDoc
+ * Controller for the whole graphical editor.
  * 
  * @author Tomas Sedmik, tomas.sedmik@gmail.com
  * @since 2013-03-07

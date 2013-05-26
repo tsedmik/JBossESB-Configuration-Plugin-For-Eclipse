@@ -7,7 +7,12 @@ import org.eclipse.draw2d.IFigure;
 import org.eclipse.draw2d.ToolbarLayout;
 import org.eclipse.draw2d.geometry.Insets;
 
-//TODO add class description
+/**
+ * Figure represents actions of the JBoss ESB's service section.
+ * 
+ * @author Tomas Sedmik, tomas.sedmik@gmail.com
+ * @since 2013-05-26
+ */
 public class ServiceActionFigure extends Figure {
 
 	public ServiceActionFigure() {
@@ -19,7 +24,14 @@ public class ServiceActionFigure extends Figure {
 		setBorder(new ServiceActionBorder());
 	}
 
+	/**
+	 * Class creates a border around service actions.
+	 * 
+	 * @author Tomas Sedmik, tomas.sedmik@gmail.com
+	 * @since 2013-05-26
+	 */
 	public class ServiceActionBorder extends AbstractBorder {
+		
 		public Insets getInsets(IFigure figure) {
 			return new Insets(1, 0, 0, 0);
 		}

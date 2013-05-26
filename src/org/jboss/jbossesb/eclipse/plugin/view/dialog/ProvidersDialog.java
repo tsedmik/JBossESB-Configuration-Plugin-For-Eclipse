@@ -17,6 +17,12 @@ import org.eclipse.swt.widgets.Shell;
 import org.jboss.jbossesb.eclipse.plugin.controller.XMLElementManipulator;
 import org.jboss.jbossesb.eclipse.plugin.model.XMLElement;
 
+/**
+ * With the dialog a user can specifies concrete bus of provider. 
+ * 
+ * @author Tomas Sedmik, tomas.sedmik@gmail.com
+ * @since 2013-05-26
+ */
 public class ProvidersDialog extends TitleAreaDialog {
 
 	private XMLElement provider;

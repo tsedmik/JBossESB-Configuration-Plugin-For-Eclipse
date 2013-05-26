@@ -12,7 +12,7 @@ import org.jboss.jbossesb.eclipse.plugin.view.command.CreateProviderCommand;
 import org.jboss.jbossesb.eclipse.plugin.view.command.CreateServiceCommand;
 
 /**
- * Default policy that create objects and perform their movement
+ * Default policy that create objects and perform their movement.
  * 
  * @author Tomas Sedmik, tomas.sedmik@gmail.com
  * @since 2013-05-23

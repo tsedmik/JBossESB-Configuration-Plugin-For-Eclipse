@@ -12,7 +12,8 @@ import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
 
 /**
- * TODO JavaDoc
+ * Figure represents a JBoss ESB Service.
+ * 
  * @author Tomas Sedmik, tomas.sedmik@gmail.com
  * @since 2013-03-25
  */

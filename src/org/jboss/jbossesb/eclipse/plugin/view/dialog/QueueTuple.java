@@ -6,7 +6,7 @@ import java.util.List;
 import org.eclipse.swt.widgets.Control;
 
 /**
- * Class represents a tuple (XMLElement and its Composite parent) for BFS algorithm used in creation of editing dialog.
+ * Class represents a tuple for BFS algorithm used in creation of editing dialog.
  * 
  * @author Tomas Sedmik, tomas.sedmik@gmail.com
  * @since 2012-13-05

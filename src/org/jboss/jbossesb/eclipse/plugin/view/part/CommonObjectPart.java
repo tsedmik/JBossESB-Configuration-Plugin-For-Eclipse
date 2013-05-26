@@ -15,7 +15,7 @@ import org.jboss.jbossesb.eclipse.plugin.model.XMLElement;
 import org.jboss.jbossesb.eclipse.plugin.view.dialog.EditDialog;
 
 /**
- * Common Edit Part extracts mutual methods of every part.
+ * Common Edit Part extracts mutual methods of every edit part.
  * Provides an observer's ability. 
  * 
  * @author Tomas Sedmik, tomas.sedmik@gmail.com

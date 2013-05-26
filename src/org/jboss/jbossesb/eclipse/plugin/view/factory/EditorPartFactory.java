@@ -36,7 +36,6 @@ public class EditorPartFactory implements EditPartFactory {
 				part = new ProviderPart();
 			} else if (adress.startsWith("/jbossesb/services")) {
 				part = new ServicePart();
-				// TODO Connections
 			}
 		}
 

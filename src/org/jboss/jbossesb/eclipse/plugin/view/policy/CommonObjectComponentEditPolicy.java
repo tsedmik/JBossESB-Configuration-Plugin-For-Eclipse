@@ -7,7 +7,12 @@ import org.jboss.jbossesb.eclipse.plugin.model.XMLDocument;
 import org.jboss.jbossesb.eclipse.plugin.model.XMLElement;
 import org.jboss.jbossesb.eclipse.plugin.view.command.DeleteCommand;
 
-// TODO add class description
+/**
+ * Policy that perform object deletion.
+ * 
+ * @author Tomas Sedmik, tomas.sedmik@gmail.com
+ * @since 2013-05-26
+ */
 public class CommonObjectComponentEditPolicy extends ComponentEditPolicy {
 
 	@Override

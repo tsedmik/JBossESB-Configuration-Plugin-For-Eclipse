@@ -18,6 +18,12 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.jboss.jbossesb.eclipse.plugin.controller.PropertiesManipulator;
 
+/**
+ * Wit the dialog a user can specifies a listener from all listeners.
+ * 
+ * @author Tomas Sedmik, tomas.sedmik@gmail.com
+ * @since 2013-05-26
+ */
 public class ListenersDialog extends TitleAreaDialog {
 	
 	private StringBuilder listener;

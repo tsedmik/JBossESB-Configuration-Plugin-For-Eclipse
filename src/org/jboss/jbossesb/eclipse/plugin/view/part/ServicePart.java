@@ -21,7 +21,7 @@ import org.jboss.jbossesb.eclipse.plugin.view.policy.CommonObjectComponentEditPo
 import org.jboss.jbossesb.eclipse.plugin.view.policy.CommonObjectGraphicalNodeEditPolicy;
 
 /**
- * TODO JavaDoc
+ * Controller for a JBoss ESB service (ServiceFigure). 
  * 
  * @author Tomas Sedmik, tomas.sedmik@gmail.com
  * @since 2013-03-25
@@ -56,6 +56,12 @@ public class ServicePart extends CommonObjectPart {
 		setConnections(parent, figure, model);
 	}
 	
+	/**
+	 * Set position of figure (change model attribute <i>Rectangle</i>).
+	 * 
+	 * @param parent parental edit part - EditorPart.
+	 * @param model model containing a data about a service.
+	 */
 	private void setSizeAndPosition(EditorPart parent, XMLElement model) {
 		
 		Rectangle layout = model.getRectangle();
@@ -68,6 +74,12 @@ public class ServicePart extends CommonObjectPart {
 		parent.setLayoutConstraint(this, figure, layout);
 	}
 	
+	/**
+	 * Create a section of the actions in the service figure.
+	 * 
+	 * @param figure view figure of the service.
+	 * @param model model contains data that are represented with the figure.
+	 */
 	private void setActions(ServiceFigure figure, XMLElement model) {
 		
 		// TODO do it better. It is not necessary to remove all actions during every repaint.
@@ -96,6 +108,13 @@ public class ServicePart extends CommonObjectPart {
 		}
 	}
 	
+	/**
+	 * Create a connection between service and provider figures.
+	 * 
+	 * @param parent parental edit part - EditorPart.
+	 * @param figure figure of a service.
+	 * @param model model that is represented with the figure.
+	 */
 	private void setConnections(EditorPart parent, ServiceFigure figure, XMLElement model) {
 	
 		List<XMLElement> children = model.getChildren();
@@ -132,6 +151,12 @@ public class ServicePart extends CommonObjectPart {
 		}
 	}
 	
+	/**
+	 * Try to get a provider's bus figure that are 
+	 * @param parent parental edit part - EditorPart.
+	 * @param busid identification of a bus.
+	 * @return bus figure - corresponds with busid, null - such a bus doesn't exists.  
+	 */
 	@SuppressWarnings("unchecked")
 	private ProviderBusFigure getConnectionTarget(EditorPart parent, String busid) {
 		

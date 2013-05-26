@@ -36,6 +36,9 @@ public class GraphicalEditorPalette extends PaletteRoot {
 		addConnectionTool();
 	}
 	
+	/**
+	 * Create a separation of the palette.
+	 */
 	private void addGroup() {
 		head = new PaletteGroup("General Controls");
 		add(head);
@@ -51,12 +54,18 @@ public class GraphicalEditorPalette extends PaletteRoot {
 		
 	}
 
+	/**
+	 * Adds a selection tool.
+	 */
 	private void addSelectionTool() {
 		SelectionToolEntry entry = new SelectionToolEntry();
 		head.add(entry);
 		setDefaultEntry(entry);
 	}
 
+	/**
+	 * Adds a providers.
+	 */
 	private void addProviderTool() {
 		
 		ResourceBundle bundle = ResourceBundle.getBundle("org.jboss.jbossesb.eclipse.plugin.model.providers");
@@ -70,11 +79,17 @@ public class GraphicalEditorPalette extends PaletteRoot {
 		}
 	}
 	
+	/**
+	 * Add a service.
+	 */
 	private void addServiceTool() {
 		CreationToolEntry entry = new CreationToolEntry("Service", "Create a new Service", new ServiceFactory(), null, null);
 		service.add(entry);
 	}
 	
+	/**
+	 * Add a connection.
+	 */
 	private void addConnectionTool() {
 		ConnectionCreationToolEntry entry = new ConnectionCreationToolEntry("Connection", "Create a new Connection", new LinkFactory(), null, null);
 		connection.add(entry);

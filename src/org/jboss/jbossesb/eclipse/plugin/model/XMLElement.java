@@ -31,10 +31,20 @@ public class XMLElement {
 	private Rectangle rectangle;
 	private PropertyChangeSupport listeners;
 	
+	/**
+	 * Adds a change listener. For letting know about data changes.
+	 * 
+	 * @param listener change listener.
+	 */
 	public void addPropertyChangeListener(PropertyChangeListener listener){
 		listeners.addPropertyChangeListener(listener);
 	}
 	
+	/**
+	 * Removes the change listener.
+	 * 
+	 * @param listener listener to remove.
+	 */
 	public void removePropertyChangeListener(PropertyChangeListener listener){
 		listeners.removePropertyChangeListener(listener);
 	}
@@ -56,11 +66,21 @@ public class XMLElement {
 		children = new ArrayList<XMLElement>();
 	}
 
+	/**
+	 * Adds a element as child element.
+	 * 
+	 * @param element element to add.
+	 */
 	public void addChildElement(XMLElement element) {
 		children.add(element);
 		listeners.firePropertyChange("added element", null, element);
 	}
 	
+	/**
+	 * Adds an attribute to the element.
+	 * 
+	 * @param attr attribute to add.
+	 */
 	public void addAttribute(XMLAttribute attr) {
 		attributes.add(attr);
 		listeners.firePropertyChange("added attribute", null, attr);
@@ -135,10 +155,19 @@ public class XMLElement {
 		listeners.firePropertyChange("move", oldRectangle, rectangle);
 	}
 	
+	/**
+	 * Removes a child element (if exists).
+	 * 
+	 * @param child element that is intended to remove.
+	 * @return true - element was removed, false - element didn't be a child (cannot be removed)
+	 */
 	public boolean removeChild(XMLElement child) {
 		return children.remove(child);
 	}
 
+	/**
+	 * Fires property change (for refresh view).
+	 */
 	public void refresh() {
 		listeners.firePropertyChange("something change", null, null);
 	}

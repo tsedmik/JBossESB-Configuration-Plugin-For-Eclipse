@@ -8,7 +8,7 @@ import org.jboss.jbossesb.eclipse.plugin.model.XMLElement;
 import org.jboss.jbossesb.eclipse.plugin.view.command.CreateLinkCommand;
 
 /**
- * Policy for creating connections
+ * Policy for creating connections.
  * 
  * @author Tomas Sedmik, tomas.sedmik@gmail.com
  * @since 2013-05-24
