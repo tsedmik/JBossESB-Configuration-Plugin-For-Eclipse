@@ -54,7 +54,7 @@ public class EditDialog extends TitleAreaDialog {
 
 	@Override
 	protected Control createDialogArea(Composite parent) {
-		
+
 		// layout
 		//FIXME correct dialog layout
 		Composite composite = new Composite(parent, SWT.V_SCROLL | SWT.H_SCROLL);
@@ -65,7 +65,7 @@ public class EditDialog extends TitleAreaDialog {
 		addAttributes(root, data); // root XMLElement attributes
 		addElements(root, data); // add child elements
 		addOperations(root); // add edit options
-		
+
 		return parent;
 	}
 	

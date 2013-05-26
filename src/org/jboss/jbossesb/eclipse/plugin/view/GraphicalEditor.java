@@ -122,6 +122,7 @@ public class GraphicalEditor extends GraphicalEditorWithFlyoutPalette {
 		start = 40;
 		if (doc.getServices() != null) {
 			for (XMLElement elem : doc.getServices()) {
+				//TODO set correct height (how many actions) 
 				int height = 50;
 				Rectangle layout = new Rectangle(400, start, 200, height);
 				start = start + height + 15;

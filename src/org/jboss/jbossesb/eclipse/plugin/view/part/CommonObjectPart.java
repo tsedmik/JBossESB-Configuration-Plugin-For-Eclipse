@@ -59,7 +59,6 @@ public abstract class CommonObjectPart extends AbstractGraphicalEditPart impleme
 	        }else{
 	            log.log(Level.INFO, "Editing of object \"" + ((XMLElement) getModel()).getName() + "\" was canceled.");
 	        }
-	    	
 	    } 
 	}
 }

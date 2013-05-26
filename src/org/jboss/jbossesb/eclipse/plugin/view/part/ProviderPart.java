@@ -46,7 +46,6 @@ public class ProviderPart extends CommonObjectPart {
 		figure.getProvider().getLabel().setText(name + " (" + model.getName() + ")");
 		
 		// set buses
-		// TODO is necessary to create buses every repaint? Do it better.
 		List<XMLElement> busesData = XMLElementManipulator.getBuses(model);
 		List<ProviderBusFigure> buses = new ArrayList<ProviderBusFigure>();
 		for (XMLElement busData : busesData) {

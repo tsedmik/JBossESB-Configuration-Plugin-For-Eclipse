@@ -58,10 +58,12 @@ public class XMLElement {
 
 	public void addChildElement(XMLElement element) {
 		children.add(element);
+		listeners.firePropertyChange("added element", null, element);
 	}
 	
 	public void addAttribute(XMLAttribute attr) {
 		attributes.add(attr);
+		listeners.firePropertyChange("added attribute", null, attr);
 	}
 
 	public List<XMLElement> getChildren() {
@@ -135,6 +137,10 @@ public class XMLElement {
 	
 	public boolean removeChild(XMLElement child) {
 		return children.remove(child);
+	}
+
+	public void refresh() {
+		listeners.firePropertyChange("something change", null, null);
 	}
 
 	@Override

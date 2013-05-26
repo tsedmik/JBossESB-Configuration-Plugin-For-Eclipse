@@ -4,12 +4,14 @@ import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.Set;
 
+import org.eclipse.gef.palette.ConnectionCreationToolEntry;
 import org.eclipse.gef.palette.CreationToolEntry;
 import org.eclipse.gef.palette.PaletteGroup;
 import org.eclipse.gef.palette.PaletteRoot;
 import org.eclipse.gef.palette.PaletteSeparator;
 import org.eclipse.gef.palette.SelectionToolEntry;
 import org.jboss.jbossesb.eclipse.plugin.controller.PropertiesManipulator;
+import org.jboss.jbossesb.eclipse.plugin.view.factory.LinkFactory;
 import org.jboss.jbossesb.eclipse.plugin.view.factory.ProviderFactory;
 import org.jboss.jbossesb.eclipse.plugin.view.factory.ServiceFactory;
 
@@ -74,7 +76,7 @@ public class GraphicalEditorPalette extends PaletteRoot {
 	}
 	
 	private void addConnectionTool() {
-		CreationToolEntry entry = new CreationToolEntry("Connection", "Create a new Connection", new ServiceFactory(), null, null);
+		ConnectionCreationToolEntry entry = new ConnectionCreationToolEntry("Connection", "Create a new Connection", new LinkFactory(), null, null);
 		connection.add(entry);
 	}
 }
