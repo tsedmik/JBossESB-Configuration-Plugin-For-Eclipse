@@ -92,8 +92,7 @@ public class GraphicalEditor extends GraphicalEditorWithFlyoutPalette {
 	}
 	
 	/**
-	  * Fire a {@link IEditorPart#PROP_DIRTY} property change and
-	  * call super implementation.
+	  * Fire a property change and call super implementation.
 	  */
 	@Override public void commandStackChanged(EventObject event) {
 		// FIXME need to save only if some data changed

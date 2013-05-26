@@ -42,8 +42,6 @@ public abstract class CommonObjectPart extends AbstractGraphicalEditPart impleme
 	@Override
 	public void propertyChange(PropertyChangeEvent evt) {
 		refreshVisuals();
-		refreshSourceConnections();
-	    refreshTargetConnections();
 	}
 	
 	@Override

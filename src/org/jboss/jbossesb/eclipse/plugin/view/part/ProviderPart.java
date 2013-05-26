@@ -7,6 +7,7 @@ import java.util.Random;
 import org.eclipse.draw2d.IFigure;
 import org.eclipse.draw2d.geometry.Rectangle;
 import org.eclipse.gef.EditPolicy;
+import org.eclipse.gef.editparts.AbstractEditPart;
 import org.jboss.jbossesb.eclipse.plugin.controller.XMLElementManipulator;
 import org.jboss.jbossesb.eclipse.plugin.model.XMLElement;
 import org.jboss.jbossesb.eclipse.plugin.view.figure.ProviderBusFigure;
@@ -46,6 +47,7 @@ public class ProviderPart extends CommonObjectPart {
 		figure.getProvider().getLabel().setText(name + " (" + model.getName() + ")");
 		
 		// set buses
+		// FIXME don't create a new buses after each repaint
 		List<XMLElement> busesData = XMLElementManipulator.getBuses(model);
 		List<ProviderBusFigure> buses = new ArrayList<ProviderBusFigure>();
 		for (XMLElement busData : busesData) {
@@ -65,6 +67,15 @@ public class ProviderPart extends CommonObjectPart {
 			model.setRectangle(layout);
 		}
 	    parent.setLayoutConstraint(this, figure, layout);
+	    
+	    // refresh connections (refresh all services)
+		@SuppressWarnings("unchecked")
+		List<AbstractEditPart> temp = parent.getChildren();
+		for (AbstractEditPart part : temp) {
+			if (part instanceof ServicePart) {
+				((ServicePart) part).refreshVisuals();
+			}
+		}
 	}
 	
 }

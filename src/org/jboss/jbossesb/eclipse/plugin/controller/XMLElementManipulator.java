@@ -41,7 +41,8 @@ public class XMLElementManipulator {
 	/**
 	 * Extracts value of the attribute of given element
 	 * 
-	 * @param service Object represents a JBossESB service.
+	 * @param element Object represents a JBossESB service.
+	 * @param attribute name of attribute
 	 * @return value of the attribute 'name' if exists else 'null'
 	 */
 	public static String getAttrValue(XMLElement element, String attribute) {

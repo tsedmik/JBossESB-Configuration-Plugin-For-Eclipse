@@ -427,6 +427,8 @@ public class EditDialog extends TitleAreaDialog {
 		List<XMLElement> elements = new ArrayList<XMLElement>();
 		for (QueueTuple temp : tuple.getChildren()) {
 			
+			prop = new PropertiesManipulator(temp.getAddress());
+			
 			// skip operations group
 			if (temp.getAddress().equals("o")) {
 				continue;
@@ -511,7 +513,7 @@ public class EditDialog extends TitleAreaDialog {
 	 * 
 	 * @param parent parental view object
 	 * @param address XML address of added object
-	 * @param data XML data
+	 * @param element XML data
 	 * @return created object
 	 */
 	private Control createTextInput(Composite parent, String address, XMLElement element) {

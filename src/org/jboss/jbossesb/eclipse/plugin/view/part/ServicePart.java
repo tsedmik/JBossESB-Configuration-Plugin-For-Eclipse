@@ -1,8 +1,10 @@
 package org.jboss.jbossesb.eclipse.plugin.view.part;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+import org.eclipse.draw2d.Figure;
 import org.eclipse.draw2d.IFigure;
 import org.eclipse.draw2d.Label;
 import org.eclipse.draw2d.PolylineConnection;
@@ -82,7 +84,6 @@ public class ServicePart extends CommonObjectPart {
 	 */
 	private void setActions(ServiceFigure figure, XMLElement model) {
 		
-		// TODO do it better. It is not necessary to remove all actions during every repaint.
 		figure.getActions().removeAll();
 		List<XMLElement> actions = XMLElementManipulator.getActions(model);
 		
@@ -128,7 +129,24 @@ public class ServicePart extends CommonObjectPart {
 		}
 		
 		// no listeners => end
-		if (children == null) {
+		if (children.isEmpty()) {
+			
+			// remove all connections
+			@SuppressWarnings("unchecked")
+			List<Figure> figures = figure.getParent().getChildren();
+			List<Figure> conns = new ArrayList<Figure>();
+			for (Figure fig : figures) {
+				if (fig instanceof PolylineConnection) {
+					PolylineConnection con = (PolylineConnection) fig;
+					if (con.getSourceAnchor().equals(figure.getConnectionAnchor())) {
+						conns.add(con);
+					}
+				}
+			}
+			for (Figure temp : conns) {
+				figure.getParent().remove(temp);
+			}
+			
 			return;
 		}
 		
@@ -139,13 +157,28 @@ public class ServicePart extends CommonObjectPart {
 				ProviderBusFigure target = getConnectionTarget(parent, busid);
 				if (target != null) {
 					
-					//FIXME fix adding multiple connections during refresh
+					// refresh connections
+					boolean connectionExists = false;
+					@SuppressWarnings("unchecked")
+					List<Figure> figures = figure.getParent().getChildren();
+					for (Figure fig : figures) {
+						if (fig instanceof PolylineConnection) {
+							PolylineConnection con = (PolylineConnection) fig;
+							con.repaint();
+							if (con.getSourceAnchor().equals(figure.getConnectionAnchor()) &&
+									con.getTargetAnchor().equals(target.getConnectionAnchor())) {
+								connectionExists = true;
+							}
+						}
+					}
 					
 					// create a connection
-					PolylineConnection c = new PolylineConnection();
-					c.setSourceAnchor(figure.getConnectionAnchor());
-					c.setTargetAnchor(target.getConnectionAnchor());
-					figure.getParent().add(c);
+					if (!connectionExists) {
+						PolylineConnection c = new PolylineConnection();
+						c.setSourceAnchor(figure.getConnectionAnchor());
+						c.setTargetAnchor(target.getConnectionAnchor());
+						figure.getParent().add(c);
+					}
 				}
 			}
 		}
